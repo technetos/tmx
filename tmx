@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+ACTIVE_TMUX_SESSIONS=`tmux ls | cut -d: -f1`
+
+if [[ "$1" == "ls" ]]; then
+  tmux ls
+  exit
+fi
+
+if [ -z "$TMUX" ]; then
+  if grep -w -q "$1" <<< $ACTIVE_TMUX_SESSIONS; then
+    tmux -2 attach -t $1
+  else
+    tmux -2 new-session -s $1
+  fi
+fi
