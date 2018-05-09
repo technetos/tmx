@@ -6,10 +6,30 @@ if [[ "$1" == "ls" ]]; then
   exit
 fi
 
+NEW_SESSION () {
+  tmux -f /home/plant/.tmux.conf -2 new-session -s $1
+}
+
+ATTACH () {
+  tmux -f /home/plant/.tmux.conf -2 attach -t $1
+}
+
+LAUNCH_CHAT () {
+  tmux -f /home/plant/.tmux.conf -2 new-session -s $1 \; \
+  split-window -h -l 20 'cat ~/.irssi/nicklistfifo' \; \
+  select-pane -R \; \
+  send-keys irssi Enter \;
+}
+
 if [ -z "$TMUX" ]; then
   if grep -w -q "$1" <<< $ACTIVE_TMUX_SESSIONS; then
-    tmux -2 attach -t $1
+    ATTACH $1
   else
-    tmux -2 new-session -s $1
+    if [[ "$1" == "chat" ]]; then
+      LAUNCH_CHAT $1
+    else
+      NEW_SESSION $1
+    fi
   fi
 fi
+
